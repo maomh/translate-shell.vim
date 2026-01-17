@@ -14,5 +14,5 @@ brew install translate-shell
 
 ## Install this plugin (vim-plug)
 ```
-
+Plug 'maomh/translate-shell.vim'
 ```
