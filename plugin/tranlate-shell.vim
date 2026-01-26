@@ -6,10 +6,12 @@
 function! TranslateSelectedText() abort
     " 1. 获取选中的内容 / 光标所在单词
     let s:selected_text = ''
-    if mode() ==# 'v' || mode() ==# 'V'
+    if visualmode() != ''
         " 可视化模式：获取选中的文本
+        let save_reg = getreg('"')
         normal! gvy
         let s:selected_text = getreg('"')
+        call setreg('"', save_reg)
     else
         " 普通模式：获取光标所在的单词（光标在单词任意位置都可以）
         let s:selected_text = expand('<cword>')
@@ -22,9 +24,14 @@ function! TranslateSelectedText() abort
         return
     endif
 
+    let g:translate_shell_from_to = 'en:zh' " 默认翻译方向：英文→中文
+
     " 2. 核心：调用系统trans命令，翻译方向【自动识别→中文】，获取翻译结果
     " en:zh 强制英文译中文，zh:en 强制中文译英文，auto:zh 自动识别源语言译中文
-    let s:cmd = 'trans -no-ansi auto:zh ' . shellescape(s:selected_text)
+    let s:cmd = 'trans -no-ansi ' 
+                \. trim(g:translate_shell_from_to) 
+                \. ' ' 
+                \. shellescape(s:selected_text)
     let s:result = system(s:cmd)
 
     " 3. 处理翻译结果展示
